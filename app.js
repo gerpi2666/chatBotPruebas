@@ -93,13 +93,14 @@ const main = async () => {
     app.use(express.json());
     app.use(bodyParser.urlencoded({ extended: false }));
     app.use(bodyParser.json())
-
+    
 
     app.post("/webhook", function (request, response) {
         console.log('Incoming webhook: ' + JSON.stringify(request.body));
         response.sendStatus(200);
     });
     app.get("/webhook", function (req, res) {
+        console.log(req)
         if (
           req.query["hub.mode"] == "subscribe" &&
           req.query["hub.verify_token"] == "ASD54858ASDEDRFEWF"
@@ -110,8 +111,7 @@ const main = async () => {
         }
       });
 
-    app.use(bodyParser.urlencoded({ extended: false }));
-    app.use(bodyParser.json())
+  
 
     createBot({
         flow: adapterFlow,
