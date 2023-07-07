@@ -1,4 +1,5 @@
 const express = require('express')
+const bodyParser= require('body-parser')
 const { createBot, createProvider, createFlow, addKeyword } = require('@bot-whatsapp/bot')
 
 const MetaProvider = require('@bot-whatsapp/provider/meta')
