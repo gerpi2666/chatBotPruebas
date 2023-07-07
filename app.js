@@ -102,7 +102,7 @@ const main = async () => {
     app.get("/webhook", function (req, res) {
         if (
           req.query["hub.mode"] == "subscribe" &&
-          req.query["hub.verify_token"] == "token"
+          req.query["hub.verify_token"] == "ASD54858ASDEDRFEWF"
         ) {
           res.send(req.query["hub.challenge"]);
         } else {
