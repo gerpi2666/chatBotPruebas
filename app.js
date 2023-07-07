@@ -99,6 +99,16 @@ const main = async () => {
         console.log('Incoming webhook: ' + JSON.stringify(request.body));
         response.sendStatus(200);
     });
+    app.get("/webhook", function (req, res) {
+        if (
+          req.query["hub.mode"] == "subscribe" &&
+          req.query["hub.verify_token"] == "token"
+        ) {
+          res.send(req.query["hub.challenge"]);
+        } else {
+          res.sendStatus(400);
+        }
+      });
 
     app.use(bodyParser.urlencoded({ extended: false }));
     app.use(bodyParser.json())
