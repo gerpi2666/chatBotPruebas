@@ -1,3 +1,4 @@
+const express = require('express')
 const { createBot, createProvider, createFlow, addKeyword } = require('@bot-whatsapp/bot')
 
 const MetaProvider = require('@bot-whatsapp/provider/meta')
@@ -73,6 +74,8 @@ const flowPrincipal = addKeyword(['hola', 'ole', 'alo'])
         [flowDocs, flowGracias, flowTuto, flowDiscord]
     )
 
+    const app = express();
+
 const main = async () => {
     const adapterDB = new MockAdapter()
     const adapterFlow = createFlow([flowPrincipal])
@@ -81,14 +84,27 @@ const main = async () => {
         jwtToken: 'EAAISNFGjQmkBABdy1JSBjts6puNQwjYgFvy92tY6DZCZB2yQqFNtrCVeCLAGWALd51dlxgqYZAdGhOumAcTsZBnEsMQoSnCDiNQXqfFfClGfVXAv5BS9Lu6FU3ZBHXxDXDOgEduZAHgVjc1VOudht52iV9gKc8QIE7JKvdn1Nl8cRLJrzgw4GevdyXqUCRcgOgb5oXcHZA8ZB3HNNQi5qFWQsX3d6nFVZBsAZD',
         numberId: '106949302460057',
         verifyToken: 'ASD54858ASDEDRFEWF',
-        version: 'v16.0',
+        version: 'v17.0',
     })
 
+    
+
+    app.use(express.json());
+    app.post('/webhook', async (req, res) => {
+        res.status(200).send({ data: 'enviado!' })
+    })
+   
     createBot({
         flow: adapterFlow,
         provider: adapterProvider,
         database: adapterDB,
     })
+
+    app.listen(3000, () => {
+        console.log('SERVER ARRIBA');
+    })
+
 }
 
 main()
+
