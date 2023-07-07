@@ -74,7 +74,7 @@ const flowPrincipal = addKeyword(['hola', 'ole', 'alo'])
         [flowDocs, flowGracias, flowTuto, flowDiscord]
     )
 
-    const app = express();
+const app = express();
 
 const main = async () => {
     const adapterDB = new MockAdapter()
@@ -87,13 +87,21 @@ const main = async () => {
         version: 'v17.0',
     })
 
-    
+
 
     app.use(express.json());
-    app.post('/webhook', async (req, res) => {
-        res.status(200).send({ data: 'enviado!' })
-    })
-   
+    app.use(bodyParser.urlencoded({ extended: false }));
+    app.use(bodyParser.json())
+
+
+    app.post("/webhook", function (request, response) {
+        console.log('Incoming webhook: ' + JSON.stringify(request.body));
+        response.sendStatus(200);
+    });
+
+    app.use(bodyParser.urlencoded({ extended: false }));
+    app.use(bodyParser.json())
+
     createBot({
         flow: adapterFlow,
         provider: adapterProvider,
