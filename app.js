@@ -100,13 +100,14 @@ const main = async () => {
     });
     app.get("/webhook", function (req, res) {
         console.log(req)
-        if (
-          req.query["hub.mode"] == "subscribe" &&
-          req.query["hub.verify_token"] == "ASD54858ASDEDRFEWF"
-        ) {
-          res.send(req.query["hub.challenge"]);
-        } else {
-          res.sendStatus(400);
+        let accessToken = "ASD54858ASDEDRFEWF";
+        let  token = req.query["hub.verify_token"];
+        let challenge = req.query["hub.challenge"];
+
+        if(challenge != null && token != null && token == accessToken){
+            res.status(200).send(challenge);
+        }else{
+            res.status(400).send();
         }
       });
 
