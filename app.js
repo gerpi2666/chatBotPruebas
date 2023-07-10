@@ -103,7 +103,7 @@ const main = async () => {
          * UPDATE YOUR VERIFY TOKEN
          *This will be the Verify Token value when you set up webhook
         **/
-        const verify_token = process.env.VERIFY_TOKEN;
+        const verify_token = 'ASD54858ASDEDRFEWF';
       
         // Parse params from the webhook verification request
         let mode = req.query["hub.mode"];
