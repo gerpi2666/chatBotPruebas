@@ -95,12 +95,12 @@ const main = async () => {
     
 
     app.post("/webhook", function (request, response) {
-       // console.log('Incoming webhook: ' + JSON.stringify(request.body));
-        response.send('POST OK');
+        console.log('Incoming webhook: ' + JSON.stringify(request.body));
+        response.sendStatus(200).send('POST OK');
     });
     app.get("/webhook", (req, res) => {
    
-       /* const verify_token = 'ASD54858ASDEDRFEWF';
+        const verify_token = 'ASD54858ASDEDRFEWF';
       
         let mode = req.query["hub.mode"];
         let token = req.query["hub.verify_token"];
@@ -113,8 +113,7 @@ const main = async () => {
           } else {
             res.sendStatus(403);
           }
-        }*/
-        //hola 
+        }
         res.send('ok get')
       });
       
