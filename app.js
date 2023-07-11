@@ -100,7 +100,7 @@ const main = async () => {
     });
     app.get("/webhook", (req, res) => {
    
-        const verify_token = 'ASD54858ASDEDRFEWF';
+       /* const verify_token = 'ASD54858ASDEDRFEWF';
       
         let mode = req.query["hub.mode"];
         let token = req.query["hub.verify_token"];
@@ -113,7 +113,8 @@ const main = async () => {
           } else {
             res.sendStatus(403);
           }
-        }
+        }*/
+        res.send('ok get')
       });
       
 
