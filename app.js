@@ -1,3 +1,5 @@
+const express = require('express')
+const bodyParser= require('body-parser')
 const { createBot, createProvider, createFlow, addKeyword } = require('@bot-whatsapp/bot')
 
 const MetaProvider = require('@bot-whatsapp/provider/meta')
@@ -73,7 +75,7 @@ const flowPrincipal = addKeyword(['hola', 'ole', 'alo'])
         [flowDocs, flowGracias, flowTuto, flowDiscord]
     )
 
-
+const app = express();
 
 const main = async () => {
     const adapterDB = new MockAdapter()
@@ -85,6 +87,36 @@ const main = async () => {
         verifyToken: 'ASD54858ASDEDRFEWF',
         version: 'v17.0',
     })
+
+
+    app.use(express.json());
+    app.use(bodyParser.urlencoded({ extended: false }));
+    app.use(bodyParser.json())
+    
+
+    app.post("/webhook", function (request, response) {
+        console.log('Incoming webhook: ' + JSON.stringify(request.body));
+        response.sendStatus(200);
+    });
+    app.get("/webhook", (req, res) => {
+   
+        const verify_token = 'ASD54858ASDEDRFEWF';
+      
+        let mode = req.query["hub.mode"];
+        let token = req.query["hub.verify_token"];
+        let challenge = req.query["hub.challenge"];
+      
+        if (mode && token) {
+          if (mode === "subscribe" && token === verify_token) {
+            console.log("WEBHOOK_VERIFIED");
+            res.status(200).send(challenge);
+          } else {
+            res.sendStatus(403);
+          }
+        }
+      });
+      
+
   
 
     createBot({
@@ -93,7 +125,10 @@ const main = async () => {
         database: adapterDB,
     })
 
- 
+    app.listen(4000, () => {
+        console.log('SERVER ARRIBA');
+    })
+
 }
 
 main()
