@@ -82,7 +82,7 @@ const main = async () => {
     const adapterFlow = createFlow([flowPrincipal])
 
     const adapterProvider = createProvider(MetaProvider, {
-        jwtToken: 'EAAISNFGjQmkBADIwAKw4iZCp64wFHJYyb5P3ZAS9QqZA2JsgZB1rhZBVbsZA34x6J028s002itYy76zHytAMhPW841QdJRkeEPZAQMNfoMWHRHoBcXPYTXNBllM1buism7SXGTfBJAzZAXQFYd1CHPaxuLl7uKKu1YsYtuS9cUV6rZCZBLiIN7SPubU6nMqZCvkPyXup8TZAoi9c4QZDZD',
+        jwtToken: 'EAAISNFGjQmkBANErynkmKJZAXcqmeKFZBXaZAeR8HzuexHdScufULt1ZByDBoueZAZAD2fq21NqlZBKZADYxoIKb3hFsZBZBdpqrXcNPyEaZAGz7YrZBpArCSU2t25OmvFiuOmf4jKZAmSpYznybxtvO3OpBn9zBRCtKINtZB6EsU8Kz24QyRUfTwb6QunAWBGgsJnTNKDnnqAmBeNAwZDZD',
         numberId: '106949302460057',
         verifyToken: 'ASD54858ASDEDRFEWF',
         version: 'v17.0',
