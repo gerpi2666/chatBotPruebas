@@ -96,7 +96,7 @@ const main = async () => {
 
     app.post("/webhook", function (request, response) {
        // console.log('Incoming webhook: ' + JSON.stringify(request.body));
-        response.sendStatus(200).send('POST OK');
+        response.send('POST OK');
     });
     app.get("/webhook", (req, res) => {
    
