@@ -161,7 +161,7 @@ const main = async () => {
     const adapterFlow = createFlow([flowPrincipal,flowRetomar,flowSolicitud,flowDatos,flowRequest,flowCancelar])
 
     const adapterProvider = createProvider(MetaProvider, {
-        jwtToken: 'EAAISNFGjQmkBANErynkmKJZAXcqmeKFZBXaZAeR8HzuexHdScufULt1ZByDBoueZAZAD2fq21NqlZBKZADYxoIKb3hFsZBZBdpqrXcNPyEaZAGz7YrZBpArCSU2t25OmvFiuOmf4jKZAmSpYznybxtvO3OpBn9zBRCtKINtZB6EsU8Kz24QyRUfTwb6QunAWBGgsJnTNKDnnqAmBeNAwZDZD',
+        jwtToken: 'EAAISNFGjQmkBAGy1ntsoncB0ZCZCi7jzZBrpSDcUfUk2bPjKre0uIJZAG4uTp77IUY9sRef9w3mMEB2BoQvcp1jTtRVpFA8dipZA5JEpjGCrYDLw47KFDMa4V1i2UlTaslWGr6OQoiU0wzPXZCsjGaq2fZACg9OCEpZCnLpowbZBwxosdgR63JjSTr2arVy08a4qFsmnwx8fulwZDZD',
         numberId: '106949302460057',
         verifyToken: 'ASD54858ASDEDRFEWF',
         version: 'v17.0',
