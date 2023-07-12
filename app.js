@@ -1,9 +1,28 @@
 const express = require('express')
 const bodyParser= require('body-parser')
-const { createBot, createProvider, createFlow, addKeyword } = require('@bot-whatsapp/bot')
+const {createBot, createProvider, createFlow, addKeyword, EVENTS} = require('@bot-whatsapp/bot')
 
 const MetaProvider = require('@bot-whatsapp/provider/meta')
 const MockAdapter = require('@bot-whatsapp/database/mock')
+
+const Configuration = require('./src/Controllers/ConfigurationController')
+const Request = require('./src/Controllers/RequestController')
+
+const solicitud = {
+    Accept:"",
+    Identification:"",
+    IdentificationType:1,
+    RequesterEmail:"",
+    RequesterCellPhone:"",
+    CreditType:2,
+    Amount:0,
+    Periods: 24,
+    NominalRate:25.00,
+    UserEmail:"chatbot@sinertica.net",
+    CustomerID:999, //Valor configurable por cliente
+    Currency:1,
+    TransactionID:1234
+}
 
 /**
  * Aqui declaramos los flujos hijos, los flujos se declaran de atras para adelante, es decir que si tienes un flujo de este tipo:
@@ -16,70 +35,130 @@ const MockAdapter = require('@bot-whatsapp/database/mock')
  *
  * Primero declaras los submenus 1.1 y 2.1, luego el 1 y 2 y al final el principal.
  */
+const flowCancelar = addKeyword('cancelar').addAnswer('Solicitud Cancelada.',null,(ctx,{endFlow})=> {
+    endFlow();
+});
 
-const flowSecundario = addKeyword(['2', 'siguiente']).addAnswer(['📄 Aquí tenemos el flujo secundario'])
+const flowRequest = addKeyword('request')
+.addAnswer('Confirmación de Datos. \n*1* Aceptar \n*2* Rechazar',
+{capture:true},
+async (ctx, {gotoFlow})=>{
+    if(ctx.body == "2"){
+       return gotoFlow(flowCancelar);
+    }
+}).addAction(async (ctx, {flowDynamic})=>{
+    Request.CreateRequest(solicitud).then(async resp=>{
+        var data = resp.Data;
+        console.log(data);
+        await flowDynamic(`Para completar la solicitud es necesario que termine de proporcionar la información requerida. \n🤳 Fotografía tipo selfie. \n📷 Fotografía de la identificación por ambos lados. \n🖋️ Firma de Autorización. \n\nIngrese al siguiente enlace para completar los datos. \n${data.Link}`)
+    })
+});
 
-const flowDocs = addKeyword(['doc', 'documentacion', 'documentación']).addAnswer(
+const flowDatos = addKeyword(['si'])
+.addAnswer(
     [
-        '📄 Aquí encontras las documentación recuerda que puedes mejorarla',
-        'https://bot-whatsapp.netlify.app/',
-        '\n*2* Para siguiente paso.',
+        'Digite su numero de identificación.',
+        '\n\n*Cancerlar* para cancelar el proceso.'
     ],
-    null,
-    null,
-    [flowSecundario]
-)
+    {capture:true},
+    async (ctx, {fallBack,gotoFlow}) => {
+        if(ctx.body == "Cancelar"){
+            gotoFlow(flowCancelar);
+        }else{
+            solicitud.identification = ctx.body;
 
-const flowTuto = addKeyword(['tutorial', 'tuto']).addAnswer(
+            if(solicitud.identification.length === 9){
+                solicitud.identificationType = 1
+            }else{
+                if(solicitud.identification.length === 12){
+                    solicitud.identificationType = 2
+                }else{
+                    fallBack('Error de identificación, vuelva a digitar el valor.');
+                }
+            }
+        }
+    })
+    .addAnswer(
     [
-        '🙌 Aquí encontras un ejemplo rapido',
-        'https://bot-whatsapp.netlify.app/docs/example/',
-        '\n*2* Para siguiente paso.',
+        'Digite el monto solicitado.',
+        '\n\n*Cancerlar* para cancelar el proceso.'
     ],
-    null,
-    null,
-    [flowSecundario]
-)
-
-const flowGracias = addKeyword(['gracias', 'grac']).addAnswer(
+    {capture:true},
+    async (ctx,{fallBack}) => {
+        solicitud.Amount = ctx.body;
+        if(isNaN(solicitud.Amount))
+            fallBack();
+    })
+    .addAnswer(
     [
-        '🚀 Puedes aportar tu granito de arena a este proyecto',
-        '[*opencollective*] https://opencollective.com/bot-whatsapp',
-        '[*buymeacoffee*] https://www.buymeacoffee.com/leifermendez',
-        '[*patreon*] https://www.patreon.com/leifermendez',
-        '\n*2* Para siguiente paso.',
+        'Digite el correo electrónico.',
+        '\n\n*Cancerlar* para cancelar el proceso.'
     ],
-    null,
-    null,
-    [flowSecundario]
-)
+    {capture:true},
+    async (ctx,{flowDynamic,fallBack,gotoFlow}) => {
+        solicitud.RequesterEmail = ctx.body;
+        if(!solicitud.RequesterEmail.includes('@')){
+            fallBack();
+        }else{
+            var tipoIdentificacion = solicitud.identificationType == 1? "Cédula":"DIMEX";
+            await flowDynamic(`Datos Guardados! \nLa información proporcionada es: \nIdentificación: *${solicitud.identification}* \nTipo de Identificación: *${tipoIdentificacion}* \nCorreo Electrónico: *${solicitud.RequesterEmail}* \nTeléfono: *${solicitud.RequesterCellPhone}*`)
+            console.log(solicitud);
+            return gotoFlow(flowRequest);
+        }
+    });
 
-const flowDiscord = addKeyword(['discord']).addAnswer(
-    ['🤪 Únete al discord', 'https://link.codigoencasa.com/DISCORD', '\n*2* Para siguiente paso.'],
-    null,
-    null,
-    [flowSecundario]
-)
+const flowSolicitud = addKeyword(['solicitud'],{sensitive:true})
+.addAnswer(
+    [
+        '📄 Para realizar una solicitud necesitamos el numero de identificación, tipo de identificación y correo electrónico.',
+        '¿Estas dispuesto a brindar dicha información?',
+        '\n*1* aceptar ',
+        '*2* rechazar',
+        '\n*3* para cancelar el proceso'
+    ],
+    {capture: true},
+    async (ctx,{gotoFlow})=>{
+        if(ctx.body === "1"){
+            solicitud.Accept = ctx.body;
+            solicitud.RequesterCellPhone = ctx.from.replace('506','');
+            await gotoFlow(flowDatos)
+        }
+        if(ctx.body === "2" || ctx.body === "3" ){
+            solicitud.Accept = ctx.body;
+            await gotoFlow(flowCancelar)
+        } 
+    }
+);
 
-const flowPrincipal = addKeyword(['hola', 'ole', 'alo'])
+const flowRetomar = addKeyword('retomar',{sensitive:true}).addAnswer('Proceso de retomar una solicitud.');
+
+const flowPrincipal = addKeyword(['hola', 'solicitud','menu','buenas','tardes','credito'])
     .addAnswer('🙌 Hola bienvenido a este *Chatbot*')
     .addAnswer(
         [
-            'te comparto los siguientes links de interes sobre el proyecto',
-            '👉 *doc* para ver la documentación',
-            '👉 *gracias*  para ver la lista de videos',
-            '👉 *discord* unirte al discord',
+            'Selecciona la opción que desees realizar',
+            '👉 *1* Crear solicitud de crédito.',
+            '👉 *2* Retomar una solicitud.',
+            '👉 *3* Cancelar el proceso.'
         ],
-        null,
-        null,
-        [flowDocs, flowGracias, flowTuto, flowDiscord]
-    )
+        {capture:true, buttons: [{ body: '1' }, { body: '2' }, { body: '3' }],
+        },
+        async (ctx, {gotoFlow}) => {
+            if(ctx.body == "1") 
+                await gotoFlow(flowSolicitud)
+            if(ctx.body == "2") 
+                await gotoFlow(flowRetomar)
+            if(ctx.body == "3") 
+                await gotoFlow(flowCancelar)
+        }
+    );
+
 
 const app = express();
 
 const main = async () => {
     const adapterDB = new MockAdapter()
-    const adapterFlow = createFlow([flowPrincipal])
+    const adapterFlow = createFlow([flowPrincipal,flowRetomar,flowSolicitud,flowDatos,flowRequest,flowCancelar])
 
     const adapterProvider = createProvider(MetaProvider, {
         jwtToken: 'EAAISNFGjQmkBANErynkmKJZAXcqmeKFZBXaZAeR8HzuexHdScufULt1ZByDBoueZAZAD2fq21NqlZBKZADYxoIKb3hFsZBZBdpqrXcNPyEaZAGz7YrZBpArCSU2t25OmvFiuOmf4jKZAmSpYznybxtvO3OpBn9zBRCtKINtZB6EsU8Kz24QyRUfTwb6QunAWBGgsJnTNKDnnqAmBeNAwZDZD',
@@ -130,7 +209,7 @@ const main = async () => {
         console.log('SERVER ARRIBA');
     })
 
-}
+};
 
 main()
 
