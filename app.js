@@ -135,9 +135,9 @@ const flowRetomar = addKeyword('retomar',{sensitive:true}).addAnswer('Proceso de
 const flowPrincipal = addKeyword(['hola', 'solicitud','menu','buenas','tardes','credito'])
     .addAnswer('🙌 Hola bienvenido a este *Chatbot*')
     .addAnswer('Selecciona la opción que desees realizar:',
-        {capture:true, buttons: [{id:"1" ,body: 'Crear solicitud de crédito.' }, { id:"2", body: 'Retomar una solicitud.' }, { id:"3", body: 'Cancelar el proceso.' }]},
+        {capture:true, buttons: [{body: 'Crear solicitud de crédito.' }, { body: 'Retomar una solicitud.' }, {  body: 'Cancelar el proceso.' }]},
         async (ctx, {gotoFlow,flowDynamic}) => {
-            await flowDynamic(`ID del boton seleccionado ${ctx.id}`)
+          //  await flowDynamic(`ID del boton seleccionado ${ctx.id}`)
             if(ctx.body == "Crear solicitud de crédito.") 
                 await gotoFlow(flowSolicitud)
             if(ctx.body == "Retomar una solicitud.") 
