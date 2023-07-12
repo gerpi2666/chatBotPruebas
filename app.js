@@ -144,6 +144,7 @@ const flowPrincipal = addKeyword(['hola', 'solicitud','menu','buenas','tardes','
         {capture:true, buttons: [{ body: '1' }, { body: '2' }, { body: '3' }],
         },
         async (ctx, {gotoFlow}) => {
+            console.log(JSON.stringify(ctx));
             if(ctx.body == "1") 
                 await gotoFlow(flowSolicitud)
             if(ctx.body == "2") 
